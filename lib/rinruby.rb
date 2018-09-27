@@ -113,21 +113,13 @@ def initialize(*args)
     opts[:port_number]=args.shift unless args.size==0
     opts[:port_width]=args.shift unless args.size==0
   end
-  default_opts= {:echo=>true, :interactive=>true, :executable=>nil, :port_number=>38442, :port_width=>1000, :hostname=>'127.0.0.1'}
+  default_opts= {:echo=>true, :interactive=>true, :executable=>nil, :port_number=>0, :hostname=>'127.0.0.1'}
 
     @opts=default_opts.merge(opts)
-    @port_width=@opts[:port_width]
     @executable=@opts[:executable]
     @hostname=@opts[:hostname]
-    while true
-      begin
-        @port_number = @opts[:port_number] + rand(port_width)
-        @server_socket = TCPServer::new(@hostname, @port_number)
-        break
-      rescue Errno::EADDRINUSE
-        sleep 0.5 if port_width == 1
-      end
-    end
+    @server_socket = TCPServer::new(@hostname, @opts[:port_number])
+    @port_number = @server_socket.local_address.ip_port
     @echo_enabled = @opts[:echo]
     @echo_stderr = false
     @interactive = @opts[:interactive]
